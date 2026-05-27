@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: scalix-automation
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: NODE_VERSION
+        value: 18
