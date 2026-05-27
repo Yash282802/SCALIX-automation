@@ -6,7 +6,7 @@ const nodemailer = require('nodemailer');
 const OpenAI = require('openai');
 
 const PORT = process.env.PORT || 5500;
-const HOST = process.env.HOST || '127.0.0.1';
+const HOST = process.env.HOST || '0.0.0.0';
 const DIR = __dirname;
 const DATA_DIR = path.join(DIR, 'data');
 
