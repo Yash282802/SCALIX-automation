@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCALIX — Admin Panel</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #fcf9f1;
+      --bg-alt: #f3f0ea;
+      --surface: #fcf9f1;
+      --surface-dim: #f1eee5;
+      --border: #c4c7c7;
+      --border-strong: #747878;
+      --text: #1c1c17;
+      --text-secondary: #444748;
+      --text-tertiary: #747878;
+      --accent: #b8f55a;
+      --accent-dim: #9dd840;
+      --font-display: 'Bricolage Grotesque', sans-serif;
+      --font-body: 'Hanken Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: var(--accent); color: #121f00; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px; font-family: var(--font-mono);
+      font-size: 11px; font-weight: 500; letter-spacing: 0.05em;
+      text-transform: uppercase; text-decoration: none;
+      transition: background .15s, color .15s, border-color .15s;
+      border: none; cursor: pointer;
+    }
+    .btn-primary { background: var(--text); color: var(--bg); }
+    .btn-primary:hover { background: #000; }
+    .btn-accent { background: var(--accent); color: #121f00; }
+    .btn-accent:hover { background: var(--accent-dim); }
+    .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--text); }
+    .btn-danger { background: #e74c3c; color: #fff; }
+    .btn-danger:hover { background: #c0392b; }
+
+    input, select, textarea {
+      font-family: var(--font-mono); font-size: 12px;
+      padding: 10px 14px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text);
+      outline: none; letter-spacing: 0.02em;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--text); }
+    label { font-family: var(--font-mono); font-size: 10px; color: var(--text-secondary); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; display: block; }
+
+    /* ===== LOGIN ===== */
+    .login-page {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 24px; background: var(--bg-alt);
+    }
+    .login-box {
+      width: 100%; max-width: 400px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 48px 36px 36px;
+    }
+    .login-box .logo {
+      font-family: var(--font-display); font-size: 22px; font-weight: 800;
+      letter-spacing: -0.03em; color: var(--text);
+      display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+    }
+    .login-box .logo .dot { width: 6px; height: 6px; background: var(--accent); display: inline-block; }
+    .login-box .sub { font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 32px; }
+    .login-box .field { margin-bottom: 16px; }
+    .login-box .field input { margin-top: 4px; }
+    .login-box .error {
+      font-family: var(--font-mono); font-size: 10px; color: #e74c3c;
+      margin-top: 8px; display: none;
+    }
+    .login-box .btn { width: 100%; justify-content: center; margin-top: 8px; }
+
+    /* ===== ADMIN LAYOUT ===== */
+    .admin-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 24px; border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .admin-header .logo {
+      font-family: var(--font-display); font-size: 16px; font-weight: 800;
+      letter-spacing: -0.03em; display: flex; align-items: center; gap: 6px;
+    }
+    .admin-header .logo .dot { width: 5px; height: 5px; background: var(--accent); display: inline-block; }
+    .admin-header .admin-info { display: flex; align-items: center; gap: 16px; }
+    .admin-header .admin-info span { font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); letter-spacing: 0.03em; }
+    .admin-body { display: flex; min-height: calc(100vh - 49px); }
+    .admin-sidebar {
+      width: 200px; border-right: 1px solid var(--border);
+      padding: 16px 0; flex-shrink: 0; background: var(--surface);
+    }
+    .admin-sidebar a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 20px; font-family: var(--font-mono); font-size: 10px;
+      color: var(--text-secondary); text-decoration: none;
+      letter-spacing: 0.03em; text-transform: uppercase;
+      transition: background .15s, color .15s;
+      border-left: 2px solid transparent;
+    }
+    .admin-sidebar a:hover { background: var(--surface-dim); color: var(--text); }
+    .admin-sidebar a.active { color: var(--text); border-left-color: var(--accent); background: var(--surface-dim); }
+    .admin-content {
+      flex: 1; padding: 24px; overflow-y: auto;
+      max-height: calc(100vh - 49px);
+    }
+
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .page-header h2 { font-family: var(--font-display); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+    .page-header .count {
+      font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary);
+      background: var(--surface-dim); padding: 4px 10px; border: 1px solid var(--border);
+    }
+
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 10px; margin-bottom: 24px; }
+    .stat-card { border: 1px solid var(--border); padding: 18px 16px; background: var(--surface); }
+    .stat-card .label { font-family: var(--font-mono); font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.05em; text-transform: uppercase; }
+    .stat-card .value { font-family: var(--font-mono); font-size: 28px; font-weight: 600; color: var(--accent-dim); margin-top: 4px; letter-spacing: -0.02em; }
+    .stat-card .change { font-family: var(--font-mono); font-size: 9px; margin-top: 2px; }
+    .stat-card .change.up { color: var(--accent-dim); }
+
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    thead { background: var(--surface-dim); }
+    th { font-family: var(--font-mono); font-size: 9px; color: var(--text-tertiary); letter-spacing: 0.05em; text-transform: uppercase; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 12px; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface-dim); }
+    td .badge {
+      display: inline-block; padding: 2px 8px; font-family: var(--font-mono);
+      font-size: 9px; letter-spacing: 0.03em; border: 1px solid var(--border);
+    }
+    td .badge.active { border-color: var(--accent); color: var(--accent-dim); }
+    td .badge.pending { border-color: #febc2e; color: #b8860b; }
+    td .badge.done { border-color: var(--accent-dim); color: var(--accent-dim); }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(28,28,23,0.4);
+      display: none; align-items: center; justify-content: center; z-index: 9999;
+      padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      width: 100%; max-width: 520px; padding: 32px;
+    }
+    .modal h3 { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+    .modal .field { margin-bottom: 14px; }
+    .modal .field label { margin-bottom: 4px; }
+    .modal .btn-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+    .modal .btn-row .btn { padding: 8px 18px; font-size: 10px; }
+
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      padding: 12px 20px; border: 1px solid var(--accent);
+      background: var(--surface); font-family: var(--font-mono);
+      font-size: 11px; letter-spacing: 0.02em;
+      display: none; z-index: 99999;
+    }
+    .toast.show { display: block; animation: toastIn .3s; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-tertiary); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.03em; }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 768px) {
+      .admin-sidebar { width: 48px; }
+      .admin-sidebar a { padding: 10px 12px; font-size: 0; gap: 0; justify-content: center; }
+      .admin-sidebar a::before { content: attr(data-icon); font-size: 14px; }
+      .admin-content { padding: 16px; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .login-box { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== LOGIN ===== -->
+  <div class="login-page" id="loginPage">
+    <div class="login-box">
+      <div class="logo"><span class="dot"></span>SCALIX</div>
+      <div class="sub">Admin Panel — Authentication Required</div>
+      <div class="field">
+        <label>User ID</label>
+        <input type="text" id="loginUser" placeholder="Enter your user ID" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Enter your password">
+      </div>
+      <div class="error" id="loginError">Invalid credentials. Try again.</div>
+      <button class="btn btn-primary" id="loginBtn" onclick="handleLogin()">Authenticate</button>
+    </div>
+  </div>
+
+  <!-- ===== ADMIN PANEL ===== -->
+  <div id="adminPanel" class="hidden">
+
+    <!-- Header -->
+    <div class="admin-header">
+      <div class="logo"><span class="dot"></span>SCALIX</div>
+      <div class="admin-info">
+        <span id="adminUserDisplay">admin</span>
+        <button class="btn btn-ghost" style="padding:6px 14px;font-size:9px;" onclick="handleLogout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="admin-body">
+      <!-- Sidebar -->
+      <nav class="admin-sidebar">
+        <a href="#" class="active" data-page="dashboard" data-icon="D">Dashboard</a>
+        <a href="#" data-page="leads" data-icon="L">Leads</a>
+        <a href="#" data-page="clients" data-icon="C">Clients</a>
+        <a href="#" data-page="projects" data-icon="P">Projects</a>
+        <a href="#" data-page="messages" data-icon="M">Messages</a>
+        <a href="#" data-page="automation" data-icon="A">Automation</a>
+        <a href="#" data-page="settings" data-icon="S">Settings</a>
+      </nav>
+
+      <!-- Content -->
+      <div class="admin-content">
+        <div id="pageLoader" style="text-align:center;padding:80px 0;font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);">Loading...</div>
+
+        <!-- DASHBOARD -->
+        <div class="page-section active" id="page-dashboard">
+          <div class="page-header">
+            <h2>Dashboard</h2>
+            <span class="count" id="dashLastUpdate">—</span>
+          </div>
+          <div class="stats-row" id="dashStats"></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Activity</th><th>Type</th><th>Status</th><th>Date</th></tr></thead>
+              <tbody id="dashActivity"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- LEADS -->
+        <div class="page-section" id="page-leads">
+          <div class="page-header">
+            <h2>Leads</h2>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-ghost" onclick="sendWelcomeToAllNew()" style="font-size:10px;" title="Send welcome to all New leads">Welcome All New</button>
+              <button class="btn btn-accent" onclick="showModal('lead')">+ New Lead</button>
+            </div>
+          </div>
+          <div class="stats-row" id="leadStats"></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Service</th><th>Status</th><th>Date</th><th></th></tr></thead>
+              <tbody id="leadsTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- CLIENTS -->
+        <div class="page-section" id="page-clients">
+          <div class="page-header">
+            <h2>Clients</h2>
+            <button class="btn btn-accent" onclick="showModal('client')">+ Add Client</button>
+          </div>
+          <div class="stats-row" id="clientStats"></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Company</th><th>Contact</th><th>Email</th><th>Projects</th><th>Status</th><th>Since</th><th></th></tr></thead>
+              <tbody id="clientsTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PROJECTS -->
+        <div class="page-section" id="page-projects">
+          <div class="page-header">
+            <h2>Projects</h2>
+            <button class="btn btn-accent" onclick="showModal('project')">+ New Project</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Project</th><th>Client</th><th>Service</th><th>Lead</th><th>Status</th><th>Deadline</th><th></th></tr></thead>
+              <tbody id="projectsTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- MESSAGES -->
+        <div class="page-section" id="page-messages">
+          <div class="page-header">
+            <h2>Messages</h2>
+            <span class="count" id="msgCount">0 total</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>From</th><th>Email</th><th>Subject</th><th>Date</th><th></th></tr></thead>
+              <tbody id="messagesTable"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- AUTOMATION -->
+        <div class="page-section" id="page-automation">
+          <div class="page-header">
+            <h2>AI Automation</h2>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-accent" onclick="runFollowupCheck()" style="font-size:10px;">Check Follow-ups</button>
+              <span class="count" id="autoStatBadge">—</span>
+            </div>
+          </div>
+          <!-- Sub-tabs -->
+          <div style="display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0;">
+            <button class="btn btn-ghost auto-tab active" data-ato="dashboard" style="border-bottom:2px solid var(--accent);border-radius:0;font-size:10px;padding:8px 16px;">Dashboard</button>
+            <button class="btn btn-ghost auto-tab" data-ato="templates" style="font-size:10px;padding:8px 16px;border-radius:0;">Templates</button>
+            <button class="btn btn-ghost auto-tab" data-ato="triggers" style="font-size:10px;padding:8px 16px;border-radius:0;">Triggers</button>
+            <button class="btn btn-ghost auto-tab" data-ato="log" style="font-size:10px;padding:8px 16px;border-radius:0;">Log</button>
+            <button class="btn btn-ghost auto-tab" data-ato="config" style="font-size:10px;padding:8px 16px;border-radius:0;">Settings</button>
+          </div>
+          <div class="auto-panels">
+            <!-- Dashboard -->
+            <div class="auto-panel active" id="auto-dashboard">
+              <div class="stats-row" id="autoStats"></div>
+              <div class="page-header" style="margin-bottom:12px;"><h3 style="font-family:var(--font-display);font-size:16px;font-weight:700;">Recent Automation Activity</h3></div>
+              <div class="table-wrap"><table><thead><tr><th>Type</th><th>To</th><th>Template</th><th>Lead</th><th>Status</th><th>Date</th></tr></thead><tbody id="autoRecentLog"></tbody></table></div>
+            </div>
+            <!-- Templates -->
+            <div class="auto-panel" id="auto-templates" style="display:none;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div style="border:1px solid var(--border);padding:16px;">
+                  <h4 style="font-family:var(--font-mono);font-size:11px;margin-bottom:8px;">Welcome Email</h4>
+                  <div class="field"><label>Subject</label><input id="tpl-we-subject"></div>
+                  <div class="field"><label>Body (HTML)</label><textarea id="tpl-we-body" rows="8" style="font-family:var(--font-mono);font-size:11px;"></textarea></div>
+                  <div style="display:flex;gap:6px;">
+                    <button class="btn btn-ghost" style="font-size:9px;padding:6px 12px;" onclick="aiGenerateTemplate('welcome_email')">AI Generate</button>
+                    <button class="btn btn-primary" style="font-size:9px;padding:6px 12px;" onclick="saveTemplate('welcome_email')">Save</button>
+                  </div>
+                  <div style="margin-top:6px;"><span style="font-family:var(--font-mono);font-size:9px;color:var(--text-tertiary);">Variables: {{name}}, {{service}}</span></div>
+                </div>
+                <div style="border:1px solid var(--border);padding:16px;">
+                  <h4 style="font-family:var(--font-mono);font-size:11px;margin-bottom:8px;">Welcome WhatsApp</h4>
+                  <div class="field"><label>Body</label><textarea id="tpl-ww-body" rows="8" style="font-family:var(--font-mono);font-size:11px;"></textarea></div>
+                  <div style="display:flex;gap:6px;">
+                    <button class="btn btn-ghost" style="font-size:9px;padding:6px 12px;" onclick="aiGenerateTemplate('welcome_whatsapp')">AI Generate</button>
+                    <button class="btn btn-primary" style="font-size:9px;padding:6px 12px;" onclick="saveTemplate('welcome_whatsapp')">Save</button>
+                  </div>
+                  <div style="margin-top:6px;"><span style="font-family:var(--font-mono);font-size:9px;color:var(--text-tertiary);">Variables: {{name}}, {{service}}</span></div>
+                </div>
+                <div style="border:1px solid var(--border);padding:16px;">
+                  <h4 style="font-family:var(--font-mono);font-size:11px;margin-bottom:8px;">Follow-up Email</h4>
+                  <div class="field"><label>Subject</label><input id="tpl-fe-subject"></div>
+                  <div class="field"><label>Body (HTML)</label><textarea id="tpl-fe-body" rows="8" style="font-family:var(--font-mono);font-size:11px;"></textarea></div>
+                  <div style="display:flex;gap:6px;">
+                    <button class="btn btn-ghost" style="font-size:9px;padding:6px 12px;" onclick="aiGenerateTemplate('followup_email')">AI Generate</button>
+                    <button class="btn btn-primary" style="font-size:9px;padding:6px 12px;" onclick="saveTemplate('followup_email')">Save</button>
+                  </div>
+                  <div style="margin-top:6px;"><span style="font-family:var(--font-mono);font-size:9px;color:var(--text-tertiary);">Variables: {{name}}, {{service}}, {{booking_link}}</span></div>
+                </div>
+                <div style="border:1px solid var(--border);padding:16px;">
+                  <h4 style="font-family:var(--font-mono);font-size:11px;margin-bottom:8px;">Follow-up WhatsApp</h4>
+                  <div class="field"><label>Body</label><textarea id="tpl-fw-body" rows="8" style="font-family:var(--font-mono);font-size:11px;"></textarea></div>
+                  <div style="display:flex;gap:6px;">
+                    <button class="btn btn-ghost" style="font-size:9px;padding:6px 12px;" onclick="aiGenerateTemplate('followup_whatsapp')">AI Generate</button>
+                    <button class="btn btn-primary" style="font-size:9px;padding:6px 12px;" onclick="saveTemplate('followup_whatsapp')">Save</button>
+                  </div>
+                  <div style="margin-top:6px;"><span style="font-family:var(--font-mono);font-size:9px;color:var(--text-tertiary);">Variables: {{name}}, {{service}}</span></div>
+                </div>
+              </div>
+            </div>
+            <!-- Triggers -->
+            <div class="auto-panel" id="auto-triggers" style="display:none;max-width:500px;">
+              <div class="field" style="margin-bottom:16px;">
+                <label>Enable Automation</label>
+                <select id="auto-enabled"><option value="true">Enabled</option><option value="false">Disabled</option></select>
+              </div>
+              <h4 style="font-family:var(--font-mono);font-size:11px;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px;">Triggers</h4>
+              <div class="field"><label>Welcome Email (on new lead)</label><select id="auto-welcome-email"><option value="true">On</option><option value="false">Off</option></select></div>
+              <div class="field"><label>Welcome WhatsApp (on new lead)</label><select id="auto-welcome-whatsapp"><option value="true">On</option><option value="false">Off</option></select></div>
+              <div class="field"><label>Follow-up Email</label><select id="auto-followup-email"><option value="true">On</option><option value="false">Off</option></select></div>
+              <div class="field"><label>Follow-up WhatsApp</label><select id="auto-followup-whatsapp"><option value="true">On</option><option value="false">Off</option></select></div>
+              <h4 style="font-family:var(--font-mono);font-size:11px;margin:16px 0 10px;border-bottom:1px solid var(--border);padding-bottom:6px;">Schedule</h4>
+              <div class="field"><label>Follow-up After (days)</label><input type="number" id="auto-followup-days" min="1" max="60"></div>
+              <div class="field"><label>Max Follow-ups per Lead</label><input type="number" id="auto-max-followups" min="1" max="20"></div>
+              <button class="btn btn-primary" onclick="saveTriggers()" style="margin-top:8px;">Save Trigger Settings</button>
+            </div>
+            <!-- Log -->
+            <div class="auto-panel" id="auto-log" style="display:none;">
+              <div class="page-header" style="margin-bottom:12px;">
+                <h3 style="font-family:var(--font-display);font-size:16px;font-weight:700;">Automation Log</h3>
+                <button class="btn btn-danger" style="font-size:9px;padding:6px 12px;" onclick="clearAutoLog()">Clear Log</button>
+              </div>
+              <div class="table-wrap"><table><thead><tr><th>Type</th><th>To</th><th>Template</th><th>Lead</th><th>Status</th><th>Date</th></tr></thead><tbody id="autoLogTable"></tbody></table></div>
+            </div>
+            <!-- Settings -->
+            <div class="auto-panel" id="auto-config" style="display:none;max-width:500px;">
+              <h4 style="font-family:var(--font-mono);font-size:11px;margin-bottom:12px;">SMTP / Email Configuration</h4>
+              <div class="field"><label>SMTP Host</label><input id="smtp-host" placeholder="smtp.gmail.com"></div>
+              <div class="field"><label>Port</label><input id="smtp-port" value="587"></div>
+              <div class="field"><label>Username</label><input id="smtp-user" placeholder="your@email.com"></div>
+              <div class="field"><label>Password</label><input id="smtp-pass" type="password" placeholder="App password or SMTP password"></div>
+              <div class="field"><label>Use SSL</label><select id="smtp-secure"><option value="false">No (STARTTLS)</option><option value="true">Yes (SSL)</option></select></div>
+              <div style="display:flex;gap:8px;margin-top:12px;">
+                <button class="btn btn-primary" onclick="saveSmtp()">Save SMTP</button>
+                <button class="btn btn-ghost" onclick="testSmtp()">Test Connection</button>
+              </div>
+              <hr style="margin:24px 0;border:none;border-top:1px solid var(--border);">
+              <h4 style="font-family:var(--font-mono);font-size:11px;margin-bottom:12px;">OpenAI (AI Personalization)</h4>
+              <div class="field"><label>API Key</label><input id="openai-key" type="password" placeholder="sk-..."></div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-primary" onclick="saveOpenAI()">Save Key</button>
+                <button class="btn btn-ghost" onclick="testOpenAI()">Test API</button>
+              </div>
+              <p style="font-family:var(--font-mono);font-size:9px;color:var(--text-tertiary);margin-top:6px;">Also accepts OPENAI_API_KEY in .env file on server.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="page-section" id="page-settings">
+          <div class="page-header"><h2>Settings</h2></div>
+          <div style="max-width:400px;">
+            <div class="field" style="margin-bottom:16px;">
+              <label>Admin User ID</label>
+              <input type="text" id="settingsUser" value="admin">
+            </div>
+            <div class="field" style="margin-bottom:16px;">
+              <label>New Password</label>
+              <input type="password" id="settingsPass" placeholder="Leave blank to keep current">
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+          </div>
+          <hr style="margin:32px 0;border:none;border-top:1px solid var(--border);">
+          <div style="max-width:400px;">
+            <h4 style="font-family:var(--font-mono);font-size:11px;margin-bottom:12px;letter-spacing:0.03em;">Sample Data</h4>
+            <button class="btn btn-ghost" onclick="seedSampleData()" style="font-size:10px;">Load Sample Data</button>
+            <button class="btn btn-danger" onclick="clearAllData()" style="margin-left:8px;font-size:10px;">Clear All Data</button>
+            <p style="font-family:var(--font-mono);font-size:9px;color:var(--text-tertiary);margin-top:8px;">This will populate the CRM with demo entries.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL ===== -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h3 id="modalTitle">New Entry</h3>
+      <div id="modalBody"></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="modalSaveBtn" onclick="saveModal()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ===== DATA LAYER =====
+    const DB = {
+      get(key, def) { try { const d = localStorage.getItem('scalix_' + key); return d ? JSON.parse(d) : def; } catch { return def; } },
+      set(key, val) { localStorage.setItem('scalix_' + key, JSON.stringify(val)); },
+      getAuth() { return this.get('auth', { user: 'admin', pass: 'admin' }); },
+      setAuth(a) { this.set('auth', a); },
+      getLeads() { return this.get('leads', []); },
+      setLeads(l) { this.set('leads', l); },
+      getClients() { return this.get('clients', []); },
+      setClients(c) { this.set('clients', c); },
+      getProjects() { return this.get('projects', []); },
+      setProjects(p) { this.set('projects', p); },
+      getMessages() { return this.get('messages', []); },
+      setMessages(m) { this.set('messages', m); },
+      getActivity() { return this.get('activity', []); },
+      setActivity(a) { this.set('activity', a); },
+      addActivity(type, detail) {
+        const act = this.getActivity();
+        act.unshift({ type, detail, status: 'done', date: new Date().toISOString().slice(0,16).replace('T',' ') });
+        if (act.length > 50) act.length = 50;
+        this.setActivity(act);
+      },
+      genId() { return Math.random().toString(36).slice(2,8).toUpperCase(); },
+    };
+
+    // ===== AUTH =====
+    function handleLogin() {
+      const u = document.getElementById('loginUser').value.trim();
+      const p = document.getElementById('loginPass').value.trim();
+      const auth = DB.getAuth();
+      if (u === auth.user && p === auth.pass) {
+        sessionStorage.setItem('scalix_session', '1');
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('adminPanel').classList.remove('hidden');
+        document.getElementById('adminUserDisplay').textContent = u;
+        DB.addActivity('Login', 'Admin logged in');
+        renderAll();
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('scalix_session');
+      location.reload();
+    }
+
+    // Check session on load
+    if (sessionStorage.getItem('scalix_session')) {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('adminPanel').classList.remove('hidden');
+      const auth = DB.getAuth();
+      document.getElementById('adminUserDisplay').textContent = auth.user;
+      renderAll();
+    }
+
+    // Enter key on login
+    document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+    document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginPass').focus(); });
+
+    // ===== NAVIGATION =====
+    document.querySelectorAll('.admin-sidebar a').forEach(a => {
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        document.querySelectorAll('.admin-sidebar a').forEach(x => x.classList.remove('active'));
+        a.classList.add('active');
+        document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('page-' + a.dataset.page).classList.add('active');
+        if (a.dataset.page === 'automation') {
+          renderAutoDashboard();
+          loadTriggers();
+          loadTemplates();
+          loadSmtp();
+        }
+      });
+    });
+
+    // ===== MODAL =====
+    let modalMode = '';
+    let modalEditId = null;
+
+    function showModal(type, editData) {
+      modalMode = type;
+      modalEditId = editData ? editData._id : null;
+      const overlay = document.getElementById('modalOverlay');
+      overlay.classList.add('open');
+      const title = document.getElementById('modalTitle');
+      const body = document.getElementById('modalBody');
+
+      if (type === 'lead') {
+        title.textContent = editData ? 'Edit Lead' : 'New Lead';
+        body.innerHTML = `
+          <div class="field"><label>Name</label><input id="mf-name" value="${editData?.name || ''}"></div>
+          <div class="field"><label>Email</label><input id="mf-email" value="${editData?.email || ''}"></div>
+          <div class="field"><label>Phone</label><input id="mf-phone" value="${editData?.phone || ''}"></div>
+          <div class="field"><label>Service</label>
+            <select id="mf-service">
+              <option value="Website Development" ${editData?.service === 'Website Development' ? 'selected' : ''}>Website Development</option>
+              <option value="SEO" ${editData?.service === 'SEO' ? 'selected' : ''}>SEO</option>
+              <option value="AI Integration" ${editData?.service === 'AI Integration' ? 'selected' : ''}>AI Integration</option>
+              <option value="CRM Systems" ${editData?.service === 'CRM Systems' ? 'selected' : ''}>CRM Systems</option>
+              <option value="Admin Dashboards" ${editData?.service === 'Admin Dashboards' ? 'selected' : ''}>Admin Dashboards</option>
+              <option value="Lead Generation" ${editData?.service === 'Lead Generation' ? 'selected' : ''}>Lead Generation</option>
+              <option value="WhatsApp & Email Automation" ${editData?.service === 'WhatsApp & Email Automation' ? 'selected' : ''}>WhatsApp & Email Automation</option>
+            </select>
+          </div>
+          <div class="field"><label>Status</label>
+            <select id="mf-status">
+              <option value="New" ${editData?.status === 'New' ? 'selected' : ''}>New</option>
+              <option value="Contacted" ${editData?.status === 'Contacted' ? 'selected' : ''}>Contacted</option>
+              <option value="Qualified" ${editData?.status === 'Qualified' ? 'selected' : ''}>Qualified</option>
+              <option value="Converted" ${editData?.status === 'Converted' ? 'selected' : ''}>Converted</option>
+              <option value="Lost" ${editData?.status === 'Lost' ? 'selected' : ''}>Lost</option>
+            </select>
+          </div>
+        `;
+      } else if (type === 'client') {
+        title.textContent = editData ? 'Edit Client' : 'New Client';
+        body.innerHTML = `
+          <div class="field"><label>Company</label><input id="mf-company" value="${editData?.company || ''}"></div>
+          <div class="field"><label>Contact Person</label><input id="mf-contact" value="${editData?.contact || ''}"></div>
+          <div class="field"><label>Email</label><input id="mf-email" value="${editData?.email || ''}"></div>
+          <div class="field"><label>Phone</label><input id="mf-phone" value="${editData?.phone || ''}"></div>
+          <div class="field"><label>Status</label>
+            <select id="mf-status">
+              <option value="Active" ${editData?.status === 'Active' ? 'selected' : ''}>Active</option>
+              <option value="Inactive" ${editData?.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
+              <option value="Lead" ${editData?.status === 'Lead' ? 'selected' : ''}>Lead</option>
+            </select>
+          </div>
+        `;
+      } else if (type === 'project') {
+        const clients = DB.getClients();
+        const leads = DB.getLeads();
+        title.textContent = editData ? 'Edit Project' : 'New Project';
+        body.innerHTML = `
+          <div class="field"><label>Project Name</label><input id="mf-name" value="${editData?.name || ''}"></div>
+          <div class="field"><label>Client</label>
+            <select id="mf-client">
+              <option value="">— Select —</option>
+              ${clients.map(c => `<option value="${c.company}" ${editData?.client === c.company ? 'selected' : ''}>${c.company}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field"><label>Service</label>
+            <select id="mf-service">
+              <option value="Website Development" ${editData?.service === 'Website Development' ? 'selected' : ''}>Website Development</option>
+              <option value="SEO" ${editData?.service === 'SEO' ? 'selected' : ''}>SEO</option>
+              <option value="AI Integration" ${editData?.service === 'AI Integration' ? 'selected' : ''}>AI Integration</option>
+              <option value="CRM Systems" ${editData?.service === 'CRM Systems' ? 'selected' : ''}>CRM Systems</option>
+              <option value="Admin Dashboards" ${editData?.service === 'Admin Dashboards' ? 'selected' : ''}>Admin Dashboards</option>
+              <option value="Lead Generation" ${editData?.service === 'Lead Generation' ? 'selected' : ''}>Lead Generation</option>
+              <option value="WhatsApp & Email Automation" ${editData?.service === 'WhatsApp & Email Automation' ? 'selected' : ''}>WhatsApp & Email Automation</option>
+            </select>
+          </div>
+          <div class="field"><label>Lead</label>
+            <select id="mf-lead">
+              <option value="">— None —</option>
+              ${leads.map(l => `<option value="${l.name}" ${editData?.lead === l.name ? 'selected' : ''}>${l.name}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field"><label>Status</label>
+            <select id="mf-status">
+              <option value="Planning" ${editData?.status === 'Planning' ? 'selected' : ''}>Planning</option>
+              <option value="In Progress" ${editData?.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+              <option value="Review" ${editData?.status === 'Review' ? 'selected' : ''}>Review</option>
+              <option value="Completed" ${editData?.status === 'Completed' ? 'selected' : ''}>Completed</option>
+            </select>
+          </div>
+          <div class="field"><label>Deadline</label><input type="date" id="mf-deadline" value="${editData?.deadline || ''}"></div>
+        `;
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('open');
+      modalEditId = null;
+    }
+
+    function saveModal() {
+      const v = id => document.getElementById(id)?.value?.trim() || '';
+      if (modalMode === 'lead') {
+        const leads = DB.getLeads();
+        const entry = { name: v('mf-name'), email: v('mf-email'), phone: v('mf-phone'), service: v('mf-service'), status: v('mf-status'), date: new Date().toISOString().slice(0,10) };
+        if (!entry.name) return showToast('Name is required');
+        if (modalEditId) {
+          const idx = leads.findIndex(l => l._id === modalEditId);
+          if (idx >= 0) leads[idx] = { ...leads[idx], ...entry };
+          DB.addActivity('Lead Updated', entry.name);
+        } else {
+          entry._id = DB.genId();
+          leads.push(entry);
+          DB.addActivity('Lead Added', entry.name);
+          // Auto-trigger automation
+          autoTriggerLead(entry);
+        }
+        DB.setLeads(leads);
+        showToast(modalEditId ? 'Lead updated' : 'Lead added');
+      } else if (modalMode === 'client') {
+        const clients = DB.getClients();
+        const entry = { company: v('mf-company'), contact: v('mf-contact'), email: v('mf-email'), phone: v('mf-phone'), status: v('mf-status'), since: new Date().toISOString().slice(0,10) };
+        if (!entry.company) return showToast('Company name is required');
+        if (modalEditId) {
+          const idx = clients.findIndex(c => c._id === modalEditId);
+          if (idx >= 0) clients[idx] = { ...clients[idx], ...entry };
+          DB.addActivity('Client Updated', entry.company);
+        } else {
+          entry._id = DB.genId();
+          clients.push(entry);
+          DB.addActivity('Client Added', entry.company);
+        }
+        DB.setClients(clients);
+        showToast(modalEditId ? 'Client updated' : 'Client added');
+      } else if (modalMode === 'project') {
+        const projects = DB.getProjects();
+        const entry = { name: v('mf-name'), client: v('mf-client'), service: v('mf-service'), lead: v('mf-lead'), status: v('mf-status'), deadline: v('mf-deadline') };
+        if (!entry.name) return showToast('Project name is required');
+        if (modalEditId) {
+          const idx = projects.findIndex(p => p._id === modalEditId);
+          if (idx >= 0) projects[idx] = { ...projects[idx], ...entry };
+          DB.addActivity('Project Updated', entry.name);
+        } else {
+          entry._id = DB.genId();
+          projects.push(entry);
+          DB.addActivity('Project Added', entry.name);
+        }
+        DB.setProjects(projects);
+        showToast(modalEditId ? 'Project updated' : 'Project added');
+      }
+      closeModal();
+      renderAll();
+    }
+
+    // Overlay click to close
+    document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+    // ===== DELETE =====
+    function deleteEntry(type, id) {
+      if (!confirm('Delete this entry?')) return;
+      if (type === 'lead') {
+        const leads = DB.getLeads().filter(l => l._id !== id);
+        DB.setLeads(leads);
+        DB.addActivity('Lead Deleted', id);
+      } else if (type === 'client') {
+        const clients = DB.getClients().filter(c => c._id !== id);
+        DB.setClients(clients);
+        DB.addActivity('Client Deleted', id);
+      } else if (type === 'project') {
+        const projects = DB.getProjects().filter(p => p._id !== id);
+        DB.setProjects(projects);
+        DB.addActivity('Project Deleted', id);
+      } else if (type === 'message') {
+        const msgs = DB.getMessages().filter(m => m._id !== id);
+        DB.setMessages(msgs);
+        DB.addActivity('Message Deleted', id);
+      }
+      renderAll();
+      showToast('Deleted');
+    }
+
+    function viewMessage(id) {
+      const msgs = DB.getMessages();
+      const m = msgs.find(x => x._id === id);
+      if (!m) return;
+      alert(`From: ${m.name} (${m.email})\nSubject: ${m.subject}\n\n${m.message}`);
+    }
+
+    // ===== SETTINGS =====
+    function saveSettings() {
+      const u = document.getElementById('settingsUser').value.trim();
+      const p = document.getElementById('settingsPass').value.trim();
+      if (!u) return showToast('User ID cannot be empty');
+      const auth = DB.getAuth();
+      auth.user = u;
+      if (p) auth.pass = p;
+      DB.setAuth(auth);
+      document.getElementById('adminUserDisplay').textContent = u;
+      showToast('Settings saved');
+    }
+
+    function clearAllData() {
+      if (!confirm('Clear ALL CRM data? This cannot be undone.')) return;
+      localStorage.removeItem('scalix_leads');
+      localStorage.removeItem('scalix_clients');
+      localStorage.removeItem('scalix_projects');
+      localStorage.removeItem('scalix_messages');
+      localStorage.removeItem('scalix_activity');
+      renderAll();
+      showToast('All data cleared');
+    }
+
+    function seedSampleData() {
+      const now = new Date();
+      const d = n => { const dt = new Date(now); dt.setDate(dt.getDate() - n); return dt.toISOString().slice(0,10); };
+
+      DB.setLeads([
+        { _id: 'L001', name: 'Arjun Mehta', email: 'arjun@techkar.com', phone: '+91-98765-43210', service: 'Website Development', status: 'Qualified', date: d(2) },
+        { _id: 'L002', name: 'Priya Sharma', email: 'priya@biznext.in', phone: '+91-87654-32109', service: 'SEO', status: 'New', date: d(1) },
+        { _id: 'L003', name: 'Rohan Gupta', email: 'rohan@sprint.ai', phone: '+91-76543-21098', service: 'AI Integration', status: 'Contacted', date: d(5) },
+        { _id: 'L004', name: 'Sneha Kapoor', email: 'sneha@luxbrands.com', phone: '+91-65432-10987', service: 'CRM Systems', status: 'Converted', date: d(10) },
+        { _id: 'L005', name: 'Vikram Singh', email: 'vikram@scaleup.io', phone: '+91-54321-09876', service: 'Lead Generation', status: 'New', date: d(0) },
+        { _id: 'L006', name: 'Ananya Reddy', email: 'ananya@finlytics.com', phone: '+91-43210-98765', service: 'Admin Dashboards', status: 'Qualified', date: d(3) },
+        { _id: 'L007', name: 'Karan Joshi', email: 'karan@shipflow.com', phone: '+91-32109-87654', service: 'WhatsApp & Email Automation', status: 'Lost', date: d(15) },
+      ]);
+
+      DB.setClients([
+        { _id: 'C001', company: 'TechKar Solutions', contact: 'Arjun Mehta', email: 'arjun@techkar.com', phone: '+91-98765-43210', status: 'Active', since: d(180) },
+        { _id: 'C002', company: 'BizNext', contact: 'Priya Sharma', email: 'priya@biznext.in', phone: '+91-87654-32109', status: 'Active', since: d(90) },
+        { _id: 'C003', company: 'Sprint AI', contact: 'Rohan Gupta', email: 'rohan@sprint.ai', phone: '+91-76543-21098', status: 'Active', since: d(45) },
+        { _id: 'C004', company: 'Luxury Brands India', contact: 'Sneha Kapoor', email: 'sneha@luxbrands.com', phone: '+91-65432-10987', status: 'Active', since: d(300) },
+        { _id: 'C005', company: 'ScaleUp.io', contact: 'Vikram Singh', email: 'vikram@scaleup.io', phone: '+91-54321-09876', status: 'Lead', since: d(2) },
+      ]);
+
+      DB.setProjects([
+        { _id: 'P001', name: 'TechKar Website Redesign', client: 'TechKar Solutions', service: 'Website Development', lead: 'Arjun Mehta', status: 'In Progress', deadline: d(-30) },
+        { _id: 'P002', name: 'BizNext SEO Audit', client: 'BizNext', service: 'SEO', lead: 'Priya Sharma', status: 'Review', deadline: d(-7) },
+        { _id: 'P003', name: 'Sprint AI Chatbot', client: 'Sprint AI', service: 'AI Integration', lead: 'Rohan Gupta', status: 'Planning', deadline: d(45) },
+        { _id: 'P004', name: 'LuxBrands CRM Setup', client: 'Luxury Brands India', service: 'CRM Systems', lead: 'Sneha Kapoor', status: 'Completed', deadline: d(-60) },
+        { _id: 'P005', name: 'ScaleUp Lead Engine', client: 'ScaleUp.io', service: 'Lead Generation', lead: 'Vikram Singh', status: 'Planning', deadline: d(21) },
+      ]);
+
+      DB.setMessages([
+        { _id: 'M001', name: 'Rahul Verma', email: 'rahul@example.com', subject: 'Partnership Inquiry', message: 'We are interested in partnering with Scalix for our automation needs. Can we schedule a call?', date: d(1) },
+        { _id: 'M002', name: 'Neha Jain', email: 'neha@example.com', subject: 'Project Quote', message: 'Please share a quote for our ecommerce website development project.', date: d(0) },
+        { _id: 'M003', name: 'Amit Bose', email: 'amit@example.com', subject: 'Support Request', message: 'Need assistance with the dashboard configuration for our CRM integration.', date: d(2) },
+      ]);
+
+      DB.setActivity([
+        { type: 'System', detail: 'Sample data loaded', status: 'done', date: now.toISOString().slice(0,16).replace('T',' ') },
+      ]);
+
+      renderAll();
+      showToast('Sample data loaded');
+    }
+
+    // ===== SEND WELCOME (manual) =====
+    async function sendWelcome(id) {
+      const leads = DB.getLeads();
+      const lead = leads.find(l => l._id === id);
+      if (!lead) return;
+      if (!confirm(`Send welcome messages to ${lead.name}?`)) return;
+      try {
+        const r = await fetch(AUTO_API + '/api/trigger-automation', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event: 'lead_created', name: lead.name, email: lead.email, phone: lead.phone, service: lead.service })
+        });
+        const d = await r.json();
+        showToast('Welcome queued for ' + lead.name + ' (' + (d.triggered?.length || 0) + ' messages)');
+        renderAutoDashboard();
+      } catch (e) {
+        showToast('Error: ' + e.message);
+      }
+    }
+
+    async function sendWelcomeToAllNew() {
+      const newLeads = DB.getLeads().filter(l => l.status === 'New');
+      if (newLeads.length === 0) return showToast('No new leads to welcome');
+      if (!confirm(`Send welcome to ${newLeads.length} new lead(s)?`)) return;
+      let sent = 0;
+      for (const lead of newLeads) {
+        try {
+          await fetch(AUTO_API + '/api/trigger-automation', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ event: 'lead_created', name: lead.name, email: lead.email, phone: lead.phone, service: lead.service })
+          });
+          sent++;
+        } catch {}
+      }
+      showToast('Welcome sent to ' + sent + ' lead(s)');
+      renderAutoDashboard();
+    }
+
+    // ===== RENDER =====
+    function renderAll() {
+      const leads = DB.getLeads();
+      const clients = DB.getClients();
+      const projects = DB.getProjects();
+      const messages = DB.getMessages();
+      const activity = DB.getActivity();
+
+      // Dashboard stats
+      document.getElementById('dashStats').innerHTML = `
+        <div class="stat-card"><div class="label">Total Leads</div><div class="value">${leads.length}</div><div class="change up">+${leads.filter(l=>l.status==='New').length} new</div></div>
+        <div class="stat-card"><div class="label">Active Clients</div><div class="value">${clients.filter(c=>c.status==='Active').length}</div></div>
+        <div class="stat-card"><div class="label">Active Projects</div><div class="value">${projects.filter(p=>p.status!=='Completed').length}</div></div>
+        <div class="stat-card"><div class="label">Messages</div><div class="value">${messages.length}</div></div>
+        <div class="stat-card"><div class="label">Conversion Rate</div><div class="value">${leads.length ? Math.round(leads.filter(l=>l.status==='Converted').length/leads.length*100) : 0}%</div></div>
+      `;
+      document.getElementById('dashLastUpdate').textContent = new Date().toLocaleString();
+
+      // Dashboard activity
+      const actBody = document.getElementById('dashActivity');
+      if (activity.length === 0) {
+        actBody.innerHTML = '<tr><td colspan="4" class="empty-state">No activity yet</td></tr>';
+      } else {
+        actBody.innerHTML = activity.slice(0,10).map(a => `
+          <tr><td>${a.detail}</td><td><span class="badge">${a.type}</span></td><td><span class="badge done">${a.status}</span></td><td style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);">${a.date}</td></tr>
+        `).join('');
+      }
+
+      // Leads table
+      const lt = document.getElementById('leadsTable');
+      if (leads.length === 0) {
+        lt.innerHTML = '<tr><td colspan="7" class="empty-state">No leads yet. Click "+ New Lead" to add one.</td></tr>';
+      } else {
+        lt.innerHTML = leads.map(l => `
+          <tr>
+            <td><strong>${l.name}</strong></td>
+            <td>${l.email}</td>
+            <td style="font-family:var(--font-mono);font-size:11px;">${l.phone || '—'}</td>
+            <td>${l.service}</td>
+            <td><span class="badge ${l.status === 'Converted' ? 'done' : l.status === 'New' ? 'pending' : 'active'}">${l.status}</span></td>
+            <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);">${l.date}</td>
+            <td style="white-space:nowrap;">
+              <button class="btn btn-ghost" style="padding:4px 8px;font-size:9px;" onclick='showModal("lead", ${JSON.stringify(l).replace(/'/g,"&#39;")})'>Edit</button>
+              <button class="btn btn-accent" style="padding:4px 8px;font-size:9px;" onclick="sendWelcome('${l._id}')">Send</button>
+              <button class="btn btn-danger" style="padding:4px 8px;font-size:9px;" onclick="deleteEntry('lead','${l._id}')">Del</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Lead stats
+      document.getElementById('leadStats').innerHTML = `
+        <div class="stat-card"><div class="label">Total Leads</div><div class="value">${leads.length}</div></div>
+        <div class="stat-card"><div class="label">New</div><div class="value">${leads.filter(l=>l.status==='New').length}</div></div>
+        <div class="stat-card"><div class="label">Qualified</div><div class="value">${leads.filter(l=>l.status==='Qualified').length}</div></div>
+        <div class="stat-card"><div class="label">Converted</div><div class="value">${leads.filter(l=>l.status==='Converted').length}</div></div>
+      `;
+
+      // Clients table
+      const ct = document.getElementById('clientsTable');
+      if (clients.length === 0) {
+        ct.innerHTML = '<tr><td colspan="7" class="empty-state">No clients yet. Click "+ Add Client" to add one.</td></tr>';
+      } else {
+        ct.innerHTML = clients.map(c => `
+          <tr>
+            <td><strong>${c.company}</strong></td>
+            <td>${c.contact}</td>
+            <td>${c.email}</td>
+            <td style="font-family:var(--font-mono);font-size:11px;text-align:center;">${projects.filter(p=>p.client===c.company).length}</td>
+            <td><span class="badge ${c.status === 'Active' ? 'active' : ''}">${c.status}</span></td>
+            <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);">${c.since}</td>
+            <td style="white-space:nowrap;">
+              <button class="btn btn-ghost" style="padding:4px 8px;font-size:9px;" onclick='showModal("client", ${JSON.stringify(c).replace(/'/g,"&#39;")})'>Edit</button>
+              <button class="btn btn-danger" style="padding:4px 8px;font-size:9px;" onclick="deleteEntry('client','${c._id}')">Del</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Client stats
+      document.getElementById('clientStats').innerHTML = `
+        <div class="stat-card"><div class="label">Total Clients</div><div class="value">${clients.length}</div></div>
+        <div class="stat-card"><div class="label">Active</div><div class="value">${clients.filter(c=>c.status==='Active').length}</div></div>
+      `;
+
+      // Projects table
+      const pt = document.getElementById('projectsTable');
+      if (projects.length === 0) {
+        pt.innerHTML = '<tr><td colspan="7" class="empty-state">No projects yet. Click "+ New Project" to add one.</td></tr>';
+      } else {
+        pt.innerHTML = projects.map(p => `
+          <tr>
+            <td><strong>${p.name}</strong></td>
+            <td>${p.client || '—'}</td>
+            <td>${p.service}</td>
+            <td>${p.lead || '—'}</td>
+            <td><span class="badge ${p.status === 'Completed' ? 'done' : p.status === 'In Progress' ? 'active' : ''}">${p.status}</span></td>
+            <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);">${p.deadline || '—'}</td>
+            <td style="white-space:nowrap;">
+              <button class="btn btn-ghost" style="padding:4px 8px;font-size:9px;" onclick='showModal("project", ${JSON.stringify(p).replace(/'/g,"&#39;")})'>Edit</button>
+              <button class="btn btn-danger" style="padding:4px 8px;font-size:9px;" onclick="deleteEntry('project','${p._id}')">Del</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Messages table
+      const mt = document.getElementById('messagesTable');
+      document.getElementById('msgCount').textContent = messages.length + ' total';
+      if (messages.length === 0) {
+        mt.innerHTML = '<tr><td colspan="5" class="empty-state">No messages received.</td></tr>';
+      } else {
+        mt.innerHTML = messages.map(m => `
+          <tr>
+            <td><strong>${m.name}</strong></td>
+            <td>${m.email}</td>
+            <td>${m.subject}</td>
+            <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);">${m.date || '—'}</td>
+            <td style="white-space:nowrap;">
+              <button class="btn btn-ghost" style="padding:4px 8px;font-size:9px;" onclick="viewMessage('${m._id}')">View</button>
+              <button class="btn btn-danger" style="padding:4px 8px;font-size:9px;" onclick="deleteEntry('message','${m._id}')">Del</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      document.getElementById('pageLoader').style.display = 'none';
+    }
+
+    // ===== AUTOMATION =====
+    const AUTO_API = window.location.origin;
+
+    // Load automation config
+    async function loadAutomationConfig() {
+      try {
+        const r = await fetch(AUTO_API + '/api/automation-config');
+        return await r.json();
+      } catch { return null; }
+    }
+
+    // Load automation log
+    async function loadAutomationLog() {
+      try {
+        const r = await fetch(AUTO_API + '/api/automation-log');
+        return await r.json();
+      } catch { return []; }
+    }
+
+    // Render automation dashboard
+    async function renderAutoDashboard() {
+      const log = await loadAutomationLog();
+      const cfg = await loadAutomationConfig();
+      const leads = DB.getLeads();
+
+      const totalEmail = log.filter(l => l.type === 'email').length;
+      const totalWhatsApp = log.filter(l => l.type === 'whatsapp').length;
+      const recent = log.slice(0, 8);
+
+      document.getElementById('autoStats').innerHTML = `
+        <div class="stat-card"><div class="label">Emails Sent</div><div class="value">${totalEmail}</div></div>
+        <div class="stat-card"><div class="label">WhatsApp Sent</div><div class="value">${totalWhatsApp}</div></div>
+        <div class="stat-card"><div class="label">Active Leads</div><div class="value">${leads.filter(l => l.status !== 'Converted' && l.status !== 'Lost').length}</div></div>
+        <div class="stat-card"><div class="label">Automation</div><div class="value">${cfg?.enabled ? 'ON' : 'OFF'}</div><div class="change ${cfg?.enabled ? 'up' : ''}">${cfg?.enabled ? 'Running' : 'Disabled'}</div></div>
+        <div class="stat-card"><div class="label">Follow-up (days)</div><div class="value">${cfg?.followup_days || 3}</div></div>
+      `;
+      document.getElementById('autoStatBadge').textContent = log.length + ' actions';
+
+      const tb = document.getElementById('autoRecentLog');
+      if (recent.length === 0) {
+        tb.innerHTML = '<tr><td colspan="6" class="empty-state">No automation activity yet</td></tr>';
+      } else {
+        tb.innerHTML = recent.map(l => `
+          <tr>
+            <td><span class="badge ${l.type === 'email' ? 'active' : 'done'}">${l.type === 'email' ? '✉ Email' : '💬 WhatsApp'}</span></td>
+            <td>${l.to}</td>
+            <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);">${l.template || '—'}</td>
+            <td>${l.lead || '—'}</td>
+            <td><span class="badge ${l.status === 'sent' || l.status === 'queued' ? 'done' : ''}">${l.status}</span></td>
+            <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);">${l.date ? l.date.slice(0,16).replace('T',' ') : '—'}</td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    // Load templates into form
+    async function loadTemplates() {
+      const cfg = await loadAutomationConfig();
+      if (!cfg) return;
+      const t = cfg.templates || {};
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+      setVal('tpl-we-subject', t.welcome_email?.subject);
+      setVal('tpl-we-body', t.welcome_email?.body);
+      setVal('tpl-ww-body', t.welcome_whatsapp?.body);
+      setVal('tpl-fe-subject', t.followup_email?.subject);
+      setVal('tpl-fe-body', t.followup_email?.body);
+      setVal('tpl-fw-body', t.followup_whatsapp?.body);
+    }
+
+    // Save a template
+    async function saveTemplate(name) {
+      const cfg = await loadAutomationConfig();
+      if (!cfg) return;
+      const map = {
+        welcome_email: { subject: 'tpl-we-subject', body: 'tpl-we-body' },
+        welcome_whatsapp: { body: 'tpl-ww-body' },
+        followup_email: { subject: 'tpl-fe-subject', body: 'tpl-fe-body' },
+        followup_whatsapp: { body: 'tpl-fw-body' },
+      };
+      const fields = map[name];
+      if (!fields) return;
+      if (!cfg.templates) cfg.templates = {};
+      cfg.templates[name] = { ...cfg.templates[name], [fields.subject ? 'subject' : 'body']: document.getElementById(fields.subject || fields.body)?.value || '' };
+      if (fields.body) cfg.templates[name].body = document.getElementById(fields.body)?.value || '';
+      if (fields.subject) cfg.templates[name].subject = document.getElementById(fields.subject)?.value || '';
+
+      await fetch(AUTO_API + '/api/automation-config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cfg) });
+      showToast('Template saved');
+    }
+
+    // AI Generate template
+    async function aiGenerateTemplate(name) {
+      const cfg = await loadAutomationConfig();
+      const labels = {
+        welcome_email: 'a warm welcome email from Scalix for a new lead',
+        welcome_whatsapp: 'a friendly WhatsApp welcome message from Scalix for a new lead',
+        followup_email: 'a gentle follow-up email from Scalix for a lead who has not responded yet',
+        followup_whatsapp: 'a friendly WhatsApp follow-up message from Scalix for a lead who has not responded yet',
+      };
+      const prompt = `Write ${labels[name] || 'a professional message'}. Use {{name}} for the lead name and {{service}} for the service they are interested in. ${name.includes('followup') ? 'Include {{booking_link}} for the call booking link.' : ''} Keep it warm and professional.`;
+      showToast('Generating with AI...');
+      try {
+        const r = await fetch(AUTO_API + '/api/ai-generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, max_tokens: 600 }) });
+        const data = await r.json();
+        if (data.error) return showToast('AI Error: ' + data.error);
+        const map = {
+          welcome_email: { subject: 'tpl-we-subject', body: 'tpl-we-body' },
+          welcome_whatsapp: { body: 'tpl-ww-body' },
+          followup_email: { subject: 'tpl-fe-subject', body: 'tpl-fe-body' },
+          followup_whatsapp: { body: 'tpl-fw-body' },
+        };
+        const fields = map[name];
+        if (!fields) return;
+        // Try to parse subject and body from AI response
+        const text = data.text;
+        if (fields.subject) {
+          const subjMatch = text.match(/Subject:\s*(.+)/i) || text.match(/^(.+)\n/);
+          if (subjMatch) document.getElementById(fields.subject).value = subjMatch[1].trim();
+          // Rest is body
+          const bodyStart = text.indexOf(subjMatch ? subjMatch[0] : '') + (subjMatch ? subjMatch[0].length : 0);
+          document.getElementById(fields.body).value = text.slice(bodyStart).trim().replace(/^Body:\s*/i, '');
+        } else {
+          document.getElementById(fields.body).value = text.replace(/^Body:\s*/i, '');
+        }
+        showToast('AI generated! Review and save.');
+      } catch (e) {
+        showToast('AI Error: ' + e.message);
+      }
+    }
+
+    // Load triggers
+    async function loadTriggers() {
+      const cfg = await loadAutomationConfig();
+      if (!cfg) return;
+      const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = String(val); };
+      set('auto-enabled', cfg.enabled);
+      set('auto-welcome-email', cfg.welcome_email);
+      set('auto-welcome-whatsapp', cfg.welcome_whatsapp);
+      set('auto-followup-email', cfg.followup_email);
+      set('auto-followup-whatsapp', cfg.followup_whatsapp);
+      set('auto-followup-days', cfg.followup_days);
+      set('auto-max-followups', cfg.max_followups);
+    }
+
+    // Save triggers
+    async function saveTriggers() {
+      const v = id => document.getElementById(id)?.value;
+      const body = {
+        enabled: v('auto-enabled') === 'true',
+        welcome_email: v('auto-welcome-email') === 'true',
+        welcome_whatsapp: v('auto-welcome-whatsapp') === 'true',
+        followup_email: v('auto-followup-email') === 'true',
+        followup_whatsapp: v('auto-followup-whatsapp') === 'true',
+        followup_days: parseInt(v('auto-followup-days')) || 3,
+        max_followups: parseInt(v('auto-max-followups')) || 3,
+      };
+      await fetch(AUTO_API + '/api/automation-config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      showToast('Trigger settings saved');
+    }
+
+    // Render full log
+    async function renderAutoLog() {
+      const log = await loadAutomationLog();
+      const tb = document.getElementById('autoLogTable');
+      if (log.length === 0) {
+        tb.innerHTML = '<tr><td colspan="6" class="empty-state">No automation log entries</td></tr>';
+      } else {
+        tb.innerHTML = log.map(l => `
+          <tr>
+            <td><span class="badge ${l.type === 'email' ? 'active' : 'done'}">${l.type === 'email' ? '✉ Email' : '💬 WhatsApp'}</span></td>
+            <td>${l.to}</td>
+            <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);">${l.template || '—'}</td>
+            <td>${l.lead || '—'}</td>
+            <td><span class="badge ${l.status === 'sent' || l.status === 'queued' ? 'done' : ''}">${l.status}</span></td>
+            <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);">${l.date ? l.date.slice(0,16).replace('T',' ') : '—'}</td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    // Clear log
+    async function clearAutoLog() {
+      if (!confirm('Clear automation log?')) return;
+      await fetch(AUTO_API + '/api/automation-log', { method: 'DELETE' });
+      renderAutoLog();
+      renderAutoDashboard();
+      showToast('Log cleared');
+    }
+
+    // SMTP config
+    async function loadSmtp() {
+      try {
+        const r = await fetch(AUTO_API + '/api/email-config');
+        const d = await r.json();
+        document.getElementById('smtp-host').value = d.host || 'smtp.gmail.com';
+        document.getElementById('smtp-port').value = d.port || '587';
+        document.getElementById('smtp-user').value = d.user || 'ytiwari2721@gmail.com';
+        document.getElementById('smtp-pass').value = d.pass || '';
+        document.getElementById('smtp-secure').value = d.secure ? 'true' : 'false';
+      } catch {}
+    }
+
+    async function saveSmtp() {
+      const v = id => document.getElementById(id)?.value;
+      const body = {
+        host: v('smtp-host'), port: parseInt(v('smtp-port')) || 587,
+        secure: v('smtp-secure') === 'true', user: v('smtp-user'), pass: v('smtp-pass'),
+      };
+      if (!body.host) return showToast('SMTP host required');
+      await fetch(AUTO_API + '/api/email-config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      showToast('SMTP settings saved');
+    }
+
+    async function testSmtp() {
+      showToast('Testing SMTP connection...');
+      try {
+        const r = await fetch(AUTO_API + '/api/email-test', { method: 'POST' });
+        const d = await r.json();
+        showToast(d.ok ? 'SMTP connected!' : 'Error: ' + (d.error || 'unknown'));
+      } catch (e) {
+        showToast('Connection failed: ' + e.message);
+      }
+    }
+
+    // OpenAI config
+    async function saveOpenAI() {
+      const key = document.getElementById('openai-key')?.value?.trim();
+      if (!key) return showToast('API key required');
+      await fetch(AUTO_API + '/api/openai-config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ apiKey: key }) });
+      showToast('OpenAI key saved');
+    }
+
+    async function testOpenAI() {
+      showToast('Testing OpenAI...');
+      try {
+        const r = await fetch(AUTO_API + '/api/ai-generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt: 'Say "Hello from Scalix AI!" in 5 words.', max_tokens: 20 }) });
+        const d = await r.json();
+        showToast(d.text ? 'AI works! Response: ' + d.text : 'Error: ' + (d.error || 'unknown'));
+      } catch (e) {
+        showToast('AI Error: ' + e.message);
+      }
+    }
+
+    // Follow-up check
+    async function runFollowupCheck() {
+      const leads = DB.getLeads().filter(l => l.status !== 'Converted' && l.status !== 'Lost');
+      if (leads.length === 0) return showToast('No leads to follow up');
+      showToast('Checking ' + leads.length + ' leads for follow-ups...');
+      try {
+        const r = await fetch(AUTO_API + '/api/check-followups', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ leads }) });
+        const d = await r.json();
+        showToast('Follow-ups queued: ' + (d.followups_sent?.email || 0) + ' email, ' + (d.followups_sent?.whatsapp || 0) + ' whatsapp');
+        renderAutoDashboard();
+        renderAutoLog();
+      } catch (e) {
+        showToast('Error: ' + e.message);
+      }
+    }
+
+    // Auto-trigger when a new lead is added
+    async function autoTriggerLead(lead) {
+      try {
+        await fetch(AUTO_API + '/api/trigger-automation', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event: 'lead_created', name: lead.name, email: lead.email, phone: lead.phone, service: lead.service })
+        });
+      } catch {}
+    }
+
+    // ==== AUTO-TABS ====
+    document.addEventListener('click', function(e) {
+      const tab = e.target.closest('.auto-tab');
+      if (!tab) return;
+      document.querySelectorAll('.auto-tab').forEach(t => { t.classList.remove('active'); t.style.borderBottom = 'none'; });
+      tab.classList.add('active');
+      tab.style.borderBottom = '2px solid var(--accent)';
+      document.querySelectorAll('.auto-panel').forEach(p => p.style.display = 'none');
+      document.getElementById('auto-' + tab.dataset.ato).style.display = 'block';
+
+      // Load content on switch
+      if (tab.dataset.ato === 'dashboard') renderAutoDashboard();
+      if (tab.dataset.ato === 'templates') loadTemplates();
+      if (tab.dataset.ato === 'triggers') loadTriggers();
+      if (tab.dataset.ato === 'log') renderAutoLog();
+      if (tab.dataset.ato === 'config') { loadSmtp(); }
+    });
+
+    // ===== TOAST =====
+    let toastTimer;
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>

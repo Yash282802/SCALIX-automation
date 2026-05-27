@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SCALIX — Systems That Scale</title>
+  <meta name="description" content="Premium growth infrastructure for modern businesses. AI automation, CRM systems, SEO, web development, and lead generation systems that scale.">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Hanken+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #fcf9f1;
+      --bg-alt: #f3f0ea;
+      --surface: #fcf9f1;
+      --surface-dim: #f1eee5;
+      --border: #c4c7c7;
+      --border-strong: #747878;
+      --text: #1c1c17;
+      --text-secondary: #444748;
+      --text-tertiary: #747878;
+      --accent: #b8f55a;
+      --accent-dim: #9dd840;
+      --font-display: 'Bricolage Grotesque', sans-serif;
+      --font-body: 'Hanken Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --nav-h: 64px;
+      --max-w: 1440px;
+      --margin-d: 64px;
+      --margin-m: 20px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: var(--accent); color: #121f00; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .progress-bar {
+      position: fixed; top: 0; left: 0; width: 0; height: 2px;
+      background: var(--accent); z-index: 9995;
+      transition: width 0.1s linear;
+    }
+
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9990;
+      height: var(--nav-h); display: flex; align-items: center;
+      padding: 0 var(--margin-d); border-bottom: 1px solid transparent;
+      transition: background .2s, border-color .2s;
+    }
+    .nav.scrolled { background: var(--bg); border-color: var(--border); }
+    .nav-inner {
+      max-width: var(--max-w); margin: 0 auto; width: 100%;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--font-display); font-size: 20px; font-weight: 800;
+      letter-spacing: -0.03em; color: var(--text); text-decoration: none;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-logo .logo-dot { width: 6px; height: 6px; background: var(--accent); display: inline-block; }
+    .nav-links { display: flex; align-items: center; gap: 4px; }
+    .nav-links a {
+      color: var(--text-secondary); text-decoration: none;
+      font-family: var(--font-mono); font-size: 11px;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      padding: 8px 14px; transition: color .15s, background .15s;
+    }
+    .nav-links a:hover { color: var(--text); background: var(--surface-dim); }
+    .nav-links .nav-cta {
+      background: var(--text); color: var(--bg); padding: 8px 20px; font-weight: 500; margin-left: 8px;
+    }
+    .nav-links .nav-cta:hover { background: #000; color: var(--bg); }
+
+    .page { padding-top: var(--nav-h); }
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 var(--margin-d); }
+
+    .section { padding: 120px 0; border-bottom: 1px solid var(--border); }
+    .section:last-of-type { border-bottom: none; }
+    .section-label {
+      font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary);
+      letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: var(--font-display); font-size: 40px; font-weight: 700;
+      line-height: 48px; letter-spacing: -0.02em; margin-bottom: 16px;
+    }
+    .section-desc { font-size: 18px; line-height: 28px; color: var(--text-secondary); max-width: 560px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; font-family: var(--font-mono);
+      font-size: 12px; font-weight: 500; letter-spacing: 0.05em;
+      text-transform: uppercase; text-decoration: none;
+      transition: background .15s, color .15s, border-color .15s;
+      border: none;
+    }
+    .btn-primary { background: var(--text); color: var(--bg); }
+    .btn-primary:hover { background: #000; }
+    .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--text); }
+    .btn-secondary:hover { background: var(--text); color: var(--bg); }
+    .btn-accent { background: var(--accent); color: #121f00; }
+    .btn-accent:hover { background: var(--accent-dim); }
+
+    /* ===== HERO ===== */
+    .hero { min-height: 100vh; display: flex; align-items: center; padding: 80px 0; }
+    .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+    .hero h1 {
+      font-family: var(--font-display); font-size: 72px; font-weight: 800;
+      line-height: 80px; letter-spacing: -0.04em; margin-bottom: 20px;
+    }
+    .hero h1 .highlight { background: var(--accent); color: #121f00; display: inline-block; padding: 0 4px; }
+    .hero p { font-size: 18px; line-height: 28px; color: var(--text-secondary); max-width: 480px; margin-bottom: 32px; }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
+    .hero-stats { display: flex; gap: 40px; padding-top: 24px; border-top: 1px solid var(--border); }
+    .hero-stat h3 { font-family: var(--font-mono); font-size: 28px; font-weight: 600; letter-spacing: -0.02em; line-height: 32px; }
+    .hero-stat h3 .num { color: var(--accent-dim); }
+    .hero-stat p { font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary); letter-spacing: 0.05em; text-transform: uppercase; }
+
+    /* Dashboard */
+
+
+    /* ===== ABOUT ===== */
+    .about-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 80px; align-items: start; }
+    .about-block { border-left: 2px solid var(--text); padding-left: 20px; margin-bottom: 24px; }
+    .about-block h4 { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .about-block p { font-size: 15px; line-height: 24px; color: var(--text-secondary); }
+    .about-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .about-metric { border: 1px solid var(--border); padding: 24px 16px; text-align: center; }
+    .about-metric h3 { font-family: var(--font-mono); font-size: 30px; font-weight: 600; letter-spacing: -0.02em; }
+    .about-metric h3 .num { color: var(--accent-dim); }
+    .about-metric p { font-family: var(--font-mono); font-size: 9px; color: var(--text-tertiary); margin-top: 4px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+    /* ===== FOUNDER ===== */
+    .founder-grid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 80px; align-items: center; }
+    .founder-image { border: 1px solid var(--border); aspect-ratio: 4/5; display: flex; align-items: center; justify-content: center; position: relative; background: var(--bg-alt); }
+    .founder-image .placeholder { font-family: var(--font-display); font-size: 80px; font-weight: 800; color: var(--border-strong); letter-spacing: -0.04em; }
+    .founder-image .status-ring { position: absolute; bottom: 16px; left: 16px; right: 16px; display: flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid var(--border); background: var(--surface); font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); letter-spacing: 0.03em; }
+    .founder-image .status-ring .dot { width: 6px; height: 6px; background: var(--accent); flex-shrink: 0; }
+    .founder-content h4 { font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+    .founder-content h2 { font-family: var(--font-display); font-size: 40px; font-weight: 700; line-height: 48px; letter-spacing: -0.02em; margin-bottom: 12px; }
+    .founder-content .title { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; letter-spacing: 0.02em; }
+    .founder-content .title .sep { width: 16px; height: 1px; background: var(--text); flex-shrink: 0; }
+    .founder-content .bio { font-size: 15px; line-height: 26px; color: var(--text-secondary); margin-bottom: 20px; }
+    .founder-achievements { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 24px; }
+    .founder-achievements span { padding: 4px 10px; border: 1px solid var(--border); font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); letter-spacing: 0.03em; }
+
+    /* ===== SERVICES ===== */
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 10px; }
+    .service-card { border: 1px solid var(--border); padding: 28px 24px; transition: border-color .15s, background .15s; }
+    .service-card:hover { border-color: var(--text); background: var(--surface-dim); }
+    .service-card .icon { width: 36px; height: 36px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 15px; margin-bottom: 16px; color: var(--text-secondary); }
+    .service-card h3 { font-family: var(--font-display); font-size: 17px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em; }
+    .service-card p { font-size: 14px; line-height: 22px; color: var(--text-secondary); }
+    .service-card .arrow-link { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 11px; color: var(--text); margin-top: 12px; text-decoration: none; letter-spacing: 0.03em; transition: gap .15s; }
+    .service-card .arrow-link:hover { gap: 8px; }
+
+    /* ===== PROCESS ===== */
+    .process-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; }
+    .process-step { border-top: 2px solid var(--border); padding-top: 14px; transition: border-color .3s; }
+    .process-step.active { border-top-color: var(--accent); }
+    .process-step .step-num { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 6px; }
+    .process-step.active .step-num { color: var(--accent-dim); }
+    .process-step h3 { font-family: var(--font-display); font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .process-step p { font-size: 13px; line-height: 20px; color: var(--text-secondary); }
+
+    /* ===== TECH ===== */
+    .tech-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 8px; }
+    .tech-card { border: 1px solid var(--border); padding: 18px 12px; text-align: center; transition: border-color .15s, background .15s; }
+    .tech-card:hover { border-color: var(--text); background: var(--surface-dim); }
+    .tech-card .tech-icon { font-size: 20px; margin-bottom: 6px; }
+    .tech-card h4 { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.02em; }
+    .tech-card p { font-family: var(--font-mono); font-size: 9px; color: var(--text-tertiary); margin-top: 2px; letter-spacing: 0.03em; text-transform: uppercase; }
+
+    /* ===== WHY ===== */
+    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .why-card { border: 1px solid var(--border); padding: 28px 24px; transition: border-color .15s, background .15s; }
+    .why-card:hover { border-color: var(--text); background: var(--surface-dim); }
+    .why-card h3 { font-family: var(--font-mono); font-size: 30px; font-weight: 600; color: var(--accent-dim); margin-bottom: 6px; letter-spacing: -0.02em; }
+    .why-card h4 { font-family: var(--font-display); font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .why-card p { font-size: 13px; line-height: 20px; color: var(--text-secondary); }
+
+    /* ===== CTA ===== */
+    .cta-section { text-align: center; border-bottom: none !important; }
+    .cta-box { border: 1px solid var(--border); padding: 80px 40px; background: var(--bg-alt); }
+    .cta-section h2 { font-family: var(--font-display); font-size: 48px; font-weight: 700; line-height: 56px; letter-spacing: -0.02em; margin-bottom: 12px; }
+    .cta-section p { color: var(--text-secondary); max-width: 480px; margin: 0 auto 28px; font-size: 16px; }
+    .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .cta-trust { display: flex; justify-content: center; gap: 32px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .cta-trust span { font-family: var(--font-mono); font-size: 11px; color: var(--text-tertiary); display: flex; align-items: center; gap: 6px; letter-spacing: 0.02em; }
+    .cta-trust span em { color: var(--accent-dim); font-style: normal; }
+
+    /* ===== FOOTER ===== */
+    .footer { padding: 48px 0 32px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+    .footer-brand .nav-logo { font-size: 18px; margin-bottom: 10px; display: inline-flex; }
+    .footer-brand p { font-size: 13px; line-height: 20px; color: var(--text-tertiary); max-width: 260px; }
+    .footer-col h4 { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 14px; }
+    .footer-col a { display: block; color: var(--text-tertiary); text-decoration: none; font-family: var(--font-mono); font-size: 11px; margin-bottom: 8px; letter-spacing: 0.02em; transition: color .15s; }
+    .footer-col a:hover { color: var(--text); }
+    .footer-bottom { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); letter-spacing: 0.02em; }
+
+    /* ===== ANIMATIONS ===== */
+    .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-up.in-view { opacity: 1; transform: translateY(0); }
+    .fade-up.d1 { transition-delay: 0.05s; }
+    .fade-up.d2 { transition-delay: 0.1s; }
+    .fade-up.d3 { transition-delay: 0.15s; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1200px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 60px; }
+      .hero h1 { font-size: 56px; line-height: 64px; }
+      .process-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+      .why-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 1024px) {
+      .about-grid { grid-template-columns: 1fr; gap: 40px; }
+      .founder-grid { grid-template-columns: 1fr; gap: 40px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .nav { padding: 0 var(--margin-m); }
+      .container { padding: 0 var(--margin-m); }
+    }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .section { padding: 80px 0; }
+      .hero h1 { font-size: 42px; line-height: 48px; letter-spacing: -0.03em; }
+      .hero-stats { gap: 24px; flex-wrap: wrap; }
+      .process-grid { grid-template-columns: 1fr; gap: 20px; }
+      .why-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 6px; text-align: center; }
+      .cta-box { padding: 48px 24px; }
+      .cta-trust { flex-direction: column; gap: 10px; align-items: center; }
+      .section-title { font-size: 32px; line-height: 38px; }
+    }
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 34px; line-height: 40px; }
+      .hero-stats { flex-direction: column; gap: 12px; }
+      .services-grid { grid-template-columns: 1fr; }
+      .tech-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(28,28,23,0.5); z-index: 9999;
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      width: 100%; max-width: 500px; padding: 36px 32px 28px;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal h3 { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-bottom: 4px; letter-spacing: -0.02em; }
+    .modal .modal-sub { font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 24px; }
+    .modal .field { margin-bottom: 14px; }
+    .modal .field label { font-family: var(--font-mono); font-size: 10px; color: var(--text-secondary); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 4px; display: block; }
+    .modal .field input, .modal .field select, .modal .field textarea {
+      font-family: var(--font-mono); font-size: 12px; padding: 10px 12px;
+      border: 1px solid var(--border); background: var(--bg); color: var(--text);
+      outline: none; width: 100%; letter-spacing: 0.02em;
+    }
+    .modal .field input:focus, .modal .field select:focus, .modal .field textarea:focus { border-color: var(--text); }
+    .modal .field textarea { resize: vertical; min-height: 80px; }
+    .modal .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+    .modal .btn-row .btn { padding: 10px 22px; font-size: 11px; }
+    .modal .success-msg { display: none; text-align: center; padding: 40px 20px; }
+    .modal .success-msg .check { font-size: 36px; margin-bottom: 12px; }
+    .modal .success-msg h4 { font-family: var(--font-display); font-size: 18px; font-weight: 700; }
+    .modal .success-msg p { font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); margin-top: 4px; letter-spacing: 0.02em; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fade-up { opacity: 1; transform: none; transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="progress-bar" id="progressBar"></div>
+
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <span class="logo-dot"></span>
+        SCALIX
+      </a>
+      <div class="nav-links">
+        <a href="#about">About</a>
+        <a href="#founder">Founder</a>
+        <a href="#services">Services</a>
+        <a href="#process">Process</a>
+        <a href="#tech">Stack</a>
+        <a href="#why">Why</a>
+        <a href="#" class="nav-cta" onclick="openBooking();return false;">Book a Call</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="page">
+
+    <!-- HERO -->
+    <section class="hero" id="hero" data-section="Hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <div class="section-label" style="margin-bottom:16px;">Systems That Scale</div>
+            <h1>
+              Growth<br>
+              Infrastructure<br>
+              for <span class="highlight">Modern</span><br>
+              Businesses
+            </h1>
+            <p>
+              We build the systems, automations, and digital infrastructure that turn ambitious businesses into scalable growth machines.
+            </p>
+            <div class="hero-btns">
+              <a href="#" class="btn btn-primary" onclick="openBooking();return false;">
+                Book Strategy Call &rarr;
+              </a>
+              <a href="#services" class="btn btn-secondary">
+                Explore Services
+              </a>
+            </div>
+            <div class="hero-stats">
+              <div class="hero-stat">
+                <h3><span class="num" data-count="50">0</span>+</h3>
+                <p>Projects Delivered</p>
+              </div>
+              <div class="hero-stat">
+                <h3><span class="num" data-count="98">0</span>%</h3>
+                <p>Client Satisfaction</p>
+              </div>
+              <div class="hero-stat">
+                <h3><span class="num" data-count="3">0</span>x</h3>
+                <p>Avg. Growth Multiplier</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Services Visual -->
+          <div>
+            <div style="border:1px solid var(--border);background:var(--surface);">
+              <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);letter-spacing:0.03em;">
+                <span style="width:6px;height:6px;background:var(--accent);display:inline-block;"></span>
+                full-stack services
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;">
+                <div style="padding:24px 16px;text-align:center;border-right:1px solid var(--border);border-bottom:1px solid var(--border);">
+                  <div style="font-size:20px;margin-bottom:6px;">&#9900;</div>
+                  <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-secondary);letter-spacing:0.03em;text-transform:uppercase;">Web Dev</div>
+                </div>
+                <div style="padding:24px 16px;text-align:center;border-right:1px solid var(--border);border-bottom:1px solid var(--border);">
+                  <div style="font-size:20px;margin-bottom:6px;">&#9650;</div>
+                  <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-secondary);letter-spacing:0.03em;text-transform:uppercase;">SEO</div>
+                </div>
+                <div style="padding:24px 16px;text-align:center;border-bottom:1px solid var(--border);">
+                  <div style="font-size:20px;margin-bottom:6px;">&#9881;</div>
+                  <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-secondary);letter-spacing:0.03em;text-transform:uppercase;">AI Systems</div>
+                </div>
+                <div style="padding:24px 16px;text-align:center;border-right:1px solid var(--border);border-bottom:1px solid var(--border);">
+                  <div style="font-size:20px;margin-bottom:6px;">&#9776;</div>
+                  <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-secondary);letter-spacing:0.03em;text-transform:uppercase;">CRM</div>
+                </div>
+                <div style="padding:24px 16px;text-align:center;border-right:1px solid var(--border);border-bottom:1px solid var(--border);">
+                  <div style="font-size:20px;margin-bottom:6px;">&#9993;</div>
+                  <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-secondary);letter-spacing:0.03em;text-transform:uppercase;">Automation</div>
+                </div>
+                <div style="padding:24px 16px;text-align:center;border-bottom:1px solid var(--border);">
+                  <div style="font-size:20px;margin-bottom:6px;">&#8593;</div>
+                  <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-secondary);letter-spacing:0.03em;text-transform:uppercase;">Lead Gen</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;font-family:var(--font-mono);font-size:9px;color:var(--text-tertiary);letter-spacing:0.03em;">
+                <span>end-to-end infrastructure</span>
+                <span style="color:var(--accent-dim);">3x avg. growth</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section" id="about" data-section="About">
+      <div class="container">
+        <div class="section-label fade-up">About</div>
+        <div class="about-grid">
+          <div>
+            <h2 class="section-title fade-up">Built Different.<br>Built to Scale.</h2>
+            <p class="section-desc fade-up" style="margin-bottom:28px;">
+              Scalix is not another agency. We are a growth infrastructure partner — engineering the systems, automations, and digital architecture that power modern businesses.
+            </p>
+            <div class="about-block fade-up">
+              <h4>Systems-First Philosophy</h4>
+              <p>Every solution we build is designed as an interconnected system — not a collection of disconnected tactics. From lead capture to fulfillment, we engineer every touchpoint.</p>
+            </div>
+            <div class="about-block fade-up d1">
+              <h4>Operational Intelligence</h4>
+              <p>We combine deep technical expertise with operational thinking. Our work reduces friction, eliminates manual work, and creates repeatable growth loops.</p>
+            </div>
+            <div class="about-block fade-up d1">
+              <h4>Execution at Scale</h4>
+              <p>We don't just plan — we build. Full-stack development, AI integration, CRM architecture, and automated revenue systems that run without you.</p>
+            </div>
+          </div>
+          <div class="about-metrics">
+            <div class="about-metric fade-up d1">
+              <h3><span class="num" data-count="4">0</span>+</h3>
+              <p>Years Operating</p>
+            </div>
+            <div class="about-metric fade-up d1">
+              <h3><span class="num" data-count="50">0</span>+</h3>
+              <p>Systems Built</p>
+            </div>
+            <div class="about-metric fade-up d2">
+              <h3><span class="num" data-count="12">0</span>+</h3>
+              <p>Industries Served</p>
+            </div>
+            <div class="about-metric fade-up d2">
+              <h3><span class="num" data-count="3">0</span>x</h3>
+              <p>Revenue Multiplier Avg</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOUNDER -->
+    <section class="section" id="founder" data-section="Founder">
+      <div class="container">
+        <div class="section-label fade-up">Founder</div>
+        <div class="founder-grid">
+          <div class="founder-image fade-up" style="overflow:hidden;">
+            <img src="CEO.jpg.png" alt="Yash Tiwari" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+            <div class="status-ring">
+              <span class="dot"></span>
+              Available for partnerships
+            </div>
+          </div>
+          <div class="founder-content">
+            <h4 class="fade-up">Yash Tiwari</h4>
+            <h2 class="fade-up d1">The Systems<br>Architect</h2>
+            <div class="title fade-up d1">
+              <span>Founder &amp; CEO, Scalix</span>
+              <span class="sep"></span>
+              <span>Growth Engineer</span>
+            </div>
+            <p class="bio fade-up d1">
+              Yash founded Scalix with a singular vision — to build the infrastructure that allows businesses to scale without breaking. With deep expertise in full-stack development, AI systems, and growth architecture, he has helped dozens of companies transform their digital operations from chaotic to systematic.
+            </p>
+            <div class="founder-achievements fade-up d2">
+              <span>Full-Stack Architect</span>
+              <span>AI Systems</span>
+              <span>Growth Engineering</span>
+              <span>Automation Design</span>
+              <span>Systems Thinker</span>
+            </div>
+            <a href="https://www.linkedin.com/in/yash-tiwari-5b778b37a" target="_blank" class="btn btn-secondary fade-up d3">
+              View LinkedIn &rarr;
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="section" id="services" data-section="Services">
+      <div class="container">
+        <div class="section-label fade-up">Services</div>
+        <h2 class="section-title fade-up" style="max-width:600px;">Full-Stack Growth Infrastructure</h2>
+        <p class="section-desc fade-up d1" style="margin-bottom:36px;">
+          End-to-end systems engineered to acquire, convert, and scale — across every channel and every touchpoint.
+        </p>
+        <div class="services-grid">
+          <div class="service-card fade-up d1">
+            <div class="icon">&#9900;</div>
+            <h3>Website Development</h3>
+            <p>High-performance websites and web applications built with modern stacks — optimized for speed, conversion, and scalability.</p>
+            <a href="#" class="arrow-link" onclick="openBooking();return false;">Learn more &rarr;</a>
+          </div>
+          <div class="service-card fade-up d1">
+            <div class="icon">&#9650;</div>
+            <h3>SEO</h3>
+            <p>Data-driven search optimization that drives qualified organic traffic. Technical SEO, content strategy, and authority building.</p>
+            <a href="#" class="arrow-link" onclick="openBooking();return false;">Learn more &rarr;</a>
+          </div>
+          <div class="service-card fade-up d1">
+            <div class="icon">&#9881;</div>
+            <h3>AI Integration</h3>
+            <p>Custom AI solutions — chatbots, content generation, data analysis, and decision systems that automate complex workflows.</p>
+            <a href="#" class="arrow-link" onclick="openBooking();return false;">Learn more &rarr;</a>
+          </div>
+          <div class="service-card fade-up d2">
+            <div class="icon">&#9776;</div>
+            <h3>CRM Systems</h3>
+            <p>Custom CRM architecture and HubSpot implementations that track, nurture, and convert leads through automated pipelines.</p>
+            <a href="#" class="arrow-link" onclick="openBooking();return false;">Learn more &rarr;</a>
+          </div>
+          <div class="service-card fade-up d2">
+            <div class="icon">&#9632;</div>
+            <h3>Admin Dashboards</h3>
+            <p>Real-time operational dashboards with live metrics, reporting, and data visualization for data-driven decision making.</p>
+            <a href="#" class="arrow-link" onclick="openBooking();return false;">Learn more &rarr;</a>
+          </div>
+          <div class="service-card fade-up d2">
+            <div class="icon">&#8593;</div>
+            <h3>Lead Generation</h3>
+            <p>Multi-channel lead generation systems that consistently deliver qualified prospects through automation and optimization.</p>
+            <a href="#" class="arrow-link" onclick="openBooking();return false;">Learn more &rarr;</a>
+          </div>
+          <div class="service-card fade-up d3" style="grid-column:1/-1;max-width:500px;margin:0 auto;">
+            <div class="icon">&#9993;</div>
+            <h3>WhatsApp &amp; Email Automation</h3>
+            <p>Automated communication workflows across email and WhatsApp — sequences, broadcasts, and triggered responses that nurture and convert.</p>
+            <a href="#" class="arrow-link" onclick="openBooking();return false;">Learn more &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROCESS -->
+    <section class="section" id="process" data-section="Process">
+      <div class="container">
+        <div class="section-label fade-up">Process</div>
+        <h2 class="section-title fade-up">How We Build</h2>
+        <p class="section-desc fade-up d1" style="margin-bottom:36px;">
+          A structured, transparent process that takes your business from discovery to scalable growth.
+        </p>
+        <div class="process-grid">
+          <div class="process-step fade-up d1 active">
+            <div class="step-num">01</div>
+            <h3>Discovery</h3>
+            <p>We dive deep into your business, goals, existing infrastructure, and bottlenecks.</p>
+          </div>
+          <div class="process-step fade-up d1">
+            <div class="step-num">02</div>
+            <h3>Infrastructure</h3>
+            <p>We design the system architecture — tech stack, data flow, automation logic, and integration points.</p>
+          </div>
+          <div class="process-step fade-up d2">
+            <div class="step-num">03</div>
+            <h3>Build</h3>
+            <p>Rapid, modular development with continuous testing. We ship in iterations so you see progress from day one.</p>
+          </div>
+          <div class="process-step fade-up d2">
+            <div class="step-num">04</div>
+            <h3>Automate</h3>
+            <p>We layer automation across every system — reducing manual work, eliminating errors, and creating self-sustaining growth loops.</p>
+          </div>
+          <div class="process-step fade-up d3">
+            <div class="step-num">05</div>
+            <h3>Scale</h3>
+            <p>We optimize, monitor, and iterate. The systems run — you focus on growing the business.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TECH STACK -->
+    <section class="section" id="tech" data-section="Tech Stack">
+      <div class="container">
+        <div class="section-label fade-up">Tech Stack</div>
+        <h2 class="section-title fade-up">The Engineering Toolkit</h2>
+        <p class="section-desc fade-up d1" style="margin-bottom:36px;">
+          Modern, battle-tested technologies we use to build growth infrastructure that performs.
+        </p>
+        <div class="tech-grid">
+          <div class="tech-card fade-up d1"><div class="tech-icon">⚛</div><h4>React / Next.js</h4><p>Frontend</p></div>
+          <div class="tech-card fade-up d1"><div class="tech-icon">TS</div><h4>TypeScript</h4><p>Type Safety</p></div>
+          <div class="tech-card fade-up d1"><div class="tech-icon">⬡</div><h4>Node.js</h4><p>Runtime</p></div>
+          <div class="tech-card fade-up d1"><div class="tech-icon">▤</div><h4>PostgreSQL</h4><p>Database</p></div>
+          <div class="tech-card fade-up d1"><div class="tech-icon">☁</div><h4>AWS / Vercel</h4><p>Infrastructure</p></div>
+          <div class="tech-card fade-up d2"><div class="tech-icon">◇</div><h4>OpenAI API</h4><p>AI Layer</p></div>
+          <div class="tech-card fade-up d2"><div class="tech-icon">✉</div><h4>WhatsApp API</h4><p>Messaging</p></div>
+          <div class="tech-card fade-up d2"><div class="tech-icon">◈</div><h4>HubSpot</h4><p>CRM Platform</p></div>
+          <div class="tech-card fade-up d2"><div class="tech-icon">◉</div><h4>Ahrefs / GSC</h4><p>SEO Suite</p></div>
+          <div class="tech-card fade-up d2"><div class="tech-icon">◔</div><h4>Metabase</h4><p>Analytics</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY SCALIX -->
+    <section class="section" id="why" data-section="Why Scalix">
+      <div class="container">
+        <div class="section-label fade-up">Why Scalix</div>
+        <h2 class="section-title fade-up">Built Different By Design</h2>
+        <p class="section-desc fade-up d1" style="margin-bottom:36px;">
+          We don't just deliver — we engineer outcomes. Here's what sets us apart.
+        </p>
+        <div class="why-grid">
+          <div class="why-card fade-up d1">
+            <h3>&lt;2h</h3>
+            <h4>Response Speed</h4>
+            <p>Average response time to client inquiries. We move fast because your business can't wait.</p>
+          </div>
+          <div class="why-card fade-up d1">
+            <h3>&lt;2w</h3>
+            <h4>Delivery Timelines</h4>
+            <p>Initial deliverables in under two weeks. We ship fast without compromising on quality or depth.</p>
+          </div>
+          <div class="why-card fade-up d1">
+            <h3>#1</h3>
+            <h4>Execution Quality</h4>
+            <p>Every line of code, every automation, every system — built to enterprise standards, delivered at startup speed.</p>
+          </div>
+          <div class="why-card fade-up d2">
+            <h3>100%</h3>
+            <h4>Operational Ownership</h4>
+            <p>We own the outcomes. From architecture to deployment to ongoing optimization — we're invested in your growth.</p>
+          </div>
+          <div class="why-card fade-up d2">
+            <h3>∞</h3>
+            <h4>Systems-First Approach</h4>
+            <p>Every solution is designed as an interconnected system that scales — not a one-off fix that breaks tomorrow.</p>
+          </div>
+          <div class="why-card fade-up d2">
+            <h3>5x</h3>
+            <h4>Growth Multiplier</h4>
+            <p>Our clients see an average of 5x return on their investment in growth infrastructure within the first quarter.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="section cta-section" id="cta" data-section="CTA">
+      <div class="container">
+        <div class="cta-box fade-up">
+          <h2 class="fade-up">Ready to Build<br>Your Growth Engine?</h2>
+          <p class="fade-up d1">Let's talk about your business, your goals, and how we can build the infrastructure to take you there.</p>
+          <div class="cta-btns">
+            <a href="#" class="btn btn-accent" onclick="openBooking();return false;">
+              Book Strategy Call &rarr;
+            </a>
+            <a href="#" class="btn btn-secondary" onclick="openBooking();return false;">
+              Send Your Brief &rarr;
+            </a>
+          </div>
+          <div class="cta-trust">
+            <span><em>&#10003;</em> 50+ projects delivered</span>
+            <span><em>&#10003;</em> 98% client satisfaction</span>
+            <span><em>&#10003;</em> 3x avg. growth multiplier</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <a href="#" class="nav-logo" style="display:inline-flex;">
+              <span class="logo-dot"></span>
+              SCALIX
+            </a>
+            <p>Premium growth infrastructure for modern businesses. Systems that scale.</p>
+          </div>
+          <div class="footer-col">
+            <h4>Services</h4>
+            <a href="#">Web Development</a>
+            <a href="#">SEO</a>
+            <a href="#">AI Integration</a>
+            <a href="#">CRM Systems</a>
+            <a href="#">Lead Generation</a>
+          </div>
+          <div class="footer-col">
+            <h4>Company</h4>
+            <a href="#">About</a>
+            <a href="#">Process</a>
+            <a href="#">Tech Stack</a>
+            <a href="#">Contact</a>
+          </div>
+          <div class="footer-col">
+            <h4>Contact</h4>
+            <a href="#">hello@scalix.agency</a>
+            <a href="#">Book a Call</a>
+            <a href="https://www.linkedin.com/in/yash-tiwari-5b778b37a" target="_blank">LinkedIn</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span>&copy; 2025 Scalix. All rights reserved.</span>
+          <span>Systems That Scale</span>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- BOOKING MODAL -->
+  <div class="modal-overlay" id="bookingModal">
+    <div class="modal">
+      <div id="bookingForm">
+        <h3>Book Strategy Call</h3>
+        <div class="modal-sub">Let's build your growth infrastructure</div>
+        <div class="field">
+          <label>Full Name</label>
+          <input type="text" id="bk-name" placeholder="Your name" autocomplete="name">
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" id="bk-email" placeholder="your@email.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label>Phone</label>
+          <input type="tel" id="bk-phone" placeholder="+91-98765-43210" autocomplete="tel">
+        </div>
+        <div class="field">
+          <label>Company</label>
+          <input type="text" id="bk-company" placeholder="Company name">
+        </div>
+        <div class="field">
+          <label>Service Interested In</label>
+          <select id="bk-service">
+            <option value="">— Select —</option>
+            <option value="Website Development">Website Development</option>
+            <option value="SEO">SEO</option>
+            <option value="AI Integration">AI Integration</option>
+            <option value="CRM Systems">CRM Systems</option>
+            <option value="Admin Dashboards">Admin Dashboards</option>
+            <option value="Lead Generation">Lead Generation</option>
+            <option value="WhatsApp & Email Automation">WhatsApp &amp; Email Automation</option>
+            <option value="Full Growth Infrastructure">Full Growth Infrastructure</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Message / Brief</label>
+          <textarea id="bk-message" placeholder="Tell us about your project, goals, or requirements..."></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="closeBooking()">Cancel</button>
+          <button class="btn btn-primary" onclick="submitBooking()">Send Request &rarr;</button>
+        </div>
+      </div>
+      <div class="success-msg" id="bookingSuccess">
+        <div class="check">&#10003;</div>
+        <h4>Request Sent</h4>
+        <p>We'll reach out within 24 hours to schedule your strategy call.</p>
+        <button class="btn btn-ghost" onclick="closeBooking()" style="margin-top:20px;">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Progress bar
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      document.getElementById('progressBar').style.width = (window.scrollY / h * 100) + '%';
+    });
+
+    // Nav scroll
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+
+    // Intersection Observer for fade-up animations (lightweight, no libs)
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in-view');
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+    // Count-up with requestAnimationFrame
+    const numObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const el = e.target;
+          const target = parseFloat(el.dataset.count);
+          const isF = target % 1 !== 0;
+          const dur = 1500;
+          const st = performance.now();
+          function upd() {
+            const p = Math.min((performance.now() - st) / dur, 1);
+            el.textContent = isF ? (p * target).toFixed(1) : Math.round(p * target);
+            if (p < 1) requestAnimationFrame(upd);
+          }
+          requestAnimationFrame(upd);
+          numObs.unobserve(el);
+        }
+      });
+    }, { threshold: 0.3 });
+
+    document.querySelectorAll('.num').forEach(el => numObs.observe(el));
+
+
+
+
+
+    // Booking modal
+    function openBooking() {
+      document.getElementById('bookingForm').style.display = 'block';
+      document.getElementById('bookingSuccess').style.display = 'none';
+      document.getElementById('bookingModal').classList.add('open');
+    }
+
+    function closeBooking() {
+      document.getElementById('bookingModal').classList.remove('open');
+    }
+
+    function submitBooking() {
+      const v = id => document.getElementById(id)?.value?.trim() || '';
+      const name = v('bk-name');
+      const email = v('bk-email');
+      const phone = v('bk-phone');
+      const company = v('bk-company');
+      const service = v('bk-service');
+      const message = v('bk-message');
+
+      if (!name || !email) {
+        alert('Please enter your name and email.');
+        return;
+      }
+
+      const entry = {
+        _id: Math.random().toString(36).slice(2,8).toUpperCase(),
+        name, email, phone, company,
+        service: service || 'Not specified',
+        subject: 'Strategy Call Request' + (service ? ' — ' + service : ''),
+        message: message || 'No additional details.',
+        date: new Date().toISOString().slice(0,10),
+        source: 'Website Booking',
+        status: 'New',
+      };
+
+      const existing = JSON.parse(localStorage.getItem('scalix_messages') || '[]');
+      existing.unshift(entry);
+      localStorage.setItem('scalix_messages', JSON.stringify(existing));
+
+      const leads = JSON.parse(localStorage.getItem('scalix_leads') || '[]');
+      leads.unshift({ _id: entry._id, name, email, phone, service: service || 'Not specified', status: 'New', date: entry.date });
+      localStorage.setItem('scalix_leads', JSON.stringify(leads));
+
+      // Trigger automation
+      try {
+        fetch(window.location.origin + '/api/trigger-automation', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ event: 'lead_created', name, email, phone: phone || '', service: service || 'Not specified' })
+        });
+      } catch {}
+
+      document.getElementById('bookingForm').style.display = 'none';
+      document.getElementById('bookingSuccess').style.display = 'block';
+    }
+
+    // Close modal on overlay click
+    document.getElementById('bookingModal').addEventListener('click', function(e) {
+      if (e.target === this) closeBooking();
+    });
+
+    // Enter key support in modal
+    document.querySelectorAll('#bookingForm input, #bookingForm select, #bookingForm textarea').forEach(el => {
+      el.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && this.tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          submitBooking();
+        }
+      });
+    });
+
+    console.log('%c SCALIX %c Systems That Scale ', 'background:#1c1c17;color:#fcf9f1;font-size:12px;font-weight:bold;padding:4px 8px;', 'background:#b8f55a;color:#121f00;font-size:12px;padding:4px 8px;');
+  </script>
+</body>
+</html>
