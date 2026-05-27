@@ -1,4 +1,4 @@
 # After Render deploys, replace YOUR_RENDER_URL with the actual Render URL
-/api/*  https://YOUR_RENDER_URL_HERE/api/:splat  200
+/api/*  https://scalix-automation.onrender.com/api/:splat  200
 /  /frontend.html  200
 /admin  /admin.html  200

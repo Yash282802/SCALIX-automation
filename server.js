@@ -317,7 +317,7 @@ const server = http.createServer(async (req, res) => {
         // Send follow-up email
         if (cfg.followup_email) {
           const tpl = cfg.templates.followup_email;
-          const html = tpl.body.replace(/\{\{name\}\}/g, lead.name).replace(/\{\{service\}\}/g, lead.service || 'our services').replace(/\{\{booking_link\}\}/g, 'http://' + HOST + ':' + PORT + '/');
+          const html = tpl.body.replace(/\{\{name\}\}/g, lead.name).replace(/\{\{service\}\}/g, lead.service || 'our services').replace(/\{\{booking_link\}\}/g, 'https://' + (process.env.PUBLIC_URL || 'scalix-automation.onrender.com') + '/');
           const subject = tpl.subject.replace(/\{\{name\}\}/g, lead.name);
           const status = await sendEmailNow(lead.email, subject, html, lead.name) ? 'sent' : 'failed';
           sent.email++;
